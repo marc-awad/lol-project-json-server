@@ -1,18 +1,3 @@
 {
-  "champions": [
-    {
-      "name": "Garen",
-      "lane": "Top",
-      "type": "Mage",
-      "imageurl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_0.jpg",
-      "id": 1
-    },
-    {
-      "name": "Ahri",
-      "lane": "Mid",
-      "type": "Mage",
-      "imageurl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg",
-      "id": 2
-    }
-  ]
+  "champions": []
 }

@@ -14,11 +14,16 @@ function loadChampion() {
       }
       champs.forEach((champ) => {
         champDiv = document.createElement("div")
+        champDiv.id = champ.id
         delButton = document.createElement("button")
         modifyButton = document.createElement("button")
 
         delButton.innerHTML = "Supprimer"
         delButton.classList.add("deletingButton")
+        delButton.addEventListener("click", async () => {
+          await deleteChampion(champ.id)
+        })
+
         modifyButton.innerHTML = "Modifier"
 
         champDiv.innerHTML = `
@@ -86,5 +91,19 @@ addButton.addEventListener("click", (e) => {
 
   addChampion(name, lane, type, imageurl)
 })
+
+function deleteChampion(champId) {
+  fetch(`http://localhost:3000/champions/${champId}`, {
+    method: "DELETE",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Champion supprimé : ", data)
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la suppresion du champion : ", error)
+    })
+  loadChampion()
+}
 
 loadChampion()
