@@ -3,18 +3,28 @@ const champions = document.getElementById("allChamp")
 const addButton = document.getElementById("addButton")
 const deleteButton = document.getElementById("deleteButton")
 
+function isValidURL(URL) {
+  const regex =
+    /https?:\/\/(?:www\.)?[^\/\s]+\/[^\s?#]+\.(?:jpg|jpeg|png|gif|bmp|webp|svg)(?:\?[^\s#]*)?(?:#[^\s]*)?/i
+  return regex.test(URL)
+}
+
+function isValidLeagueOfLegendsName(name) {
+  const regex = /^[a-zA-Z']{2,}$/
+  return regex.test(name)
+}
+
 function loadChampion() {
   fetch("http://localhost:3000/champions")
     .then((response) => response.json())
     .then((champs) => {
       if (champs.length === 0) {
-        divChamp.hidden = true
+        divChamp.style.display = "none"
       } else {
-        divChamp.hidden = false
+        divChamp.style.display = "block"
       }
       champs.forEach((champ) => {
         champDiv = document.createElement("div")
-        champDiv.id = champ.id
         delButton = document.createElement("button")
         modifyButton = document.createElement("button")
 
@@ -25,6 +35,9 @@ function loadChampion() {
         })
 
         modifyButton.innerHTML = "Modifier"
+        modifyButton.addEventListener("click", async () => {
+          await modifyChampion(champ.id)
+        })
 
         champDiv.innerHTML = `
       <h2>${champ.name}</h2>
@@ -43,6 +56,14 @@ function loadChampion() {
 }
 
 function addChampion(name, lane, type, imageurl) {
+  if (!isValidURL(imageurl)) {
+    alert("URL invalide")
+    return
+  }
+  if (!isValidLeagueOfLegendsName(name)) {
+    alert("Nom invalide")
+    return
+  }
   let newChamp = {
     name: name,
     lane: lane,
@@ -104,6 +125,17 @@ function deleteChampion(champId) {
       console.error("Erreur lors de la suppresion du champion : ", error)
     })
   loadChampion()
+}
+
+function modifyChampion(champID) {
+  prompt("Nom du champion")
+  // fetch(`http://localhost:3000/champions/${champID}`, {
+  //   method: "PUT",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify(newChamp),
+  // })
 }
 
 loadChampion()
