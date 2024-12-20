@@ -66,3 +66,7 @@ input::placeholder {
   font-style: italic;
   font-family: Arial, sans-serif;
 }
+
+.deletingButton {
+  background-color: rgb(198, 0, 0);
+}
