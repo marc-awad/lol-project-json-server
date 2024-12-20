@@ -55,6 +55,55 @@
         Supprimer tous les champions
       </button>
     </div>
+    <div id="overlay"></div>
+    <div id="popup">
+      <h3>Que voulez-vous modifier :</h3>
+      <select id="modifyChoice">
+        <option value="name">Nom</option>
+        <option value="lane">Lane</option>
+        <option value="type">Type</option>
+        <option value="imageurl">Image URL</option>
+      </select>
+      <button id="modifyChampion">Valider</button>
+    </div>
+    <div id="modifyName" class="popup">
+      <h2 for="name">Nom :</h2>
+      <input
+        id="modifyNameInput"
+        type="text"
+        placeholder="Nom de votre champion"
+      />
+      <button id="validateName">Valider</button>
+    </div>
+    <div id="modifyLane" class="popup">
+      <h2 for="lane">Lane :</h2>
+      <select id="modifyLaneSelect">
+        <option value="Top" selected>Top</option>
+        <option value="Jungle">Jungle</option>
+        <option value="Mid">Mid</option>
+        <option value="Bot">Bot</option>
+        <option value="Support">Support</option>
+      </select>
+      <button id="validateLane">Valider</button>
+    </div>
+    <div id="modifyType" class="popup">
+      <h2 for="type">Type :</h2>
+      <select id="modifyTypeSelect">
+        <option value="Mage" selected>Mage</option>
+        <option value="Assassin">Assassin</option>
+        <option value="Fighter">Fighter</option>
+        <option value="Tank">Tank</option>
+        <option value="Marksman">Marksman</option>
+        <option value="Support">Support</option>
+      </select>
+      <button id="validateType">Valider</button>
+    </div>
+    <div id="modifyImage" class="popup">
+      <h2 for="imageurl">Image URL :</h2>
+      <input id="modifyImageInput" type="text" placeholder="Lien de l'image" />
+      <button id="validateImage">Valider</button>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>
