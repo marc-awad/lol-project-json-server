@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Champion League of Legends</title>
+    <link rel="icon" href="League-of-Legends-Embleme.png" type="image/png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div>
+      <h1>Champion League of Legends</h1>
+      <form action="" method="post">
+        <label for="name">Nom : </label>
+        <input type="text" placeholder="Nom de votre champion" />
+
+        <label for="lane">Lane : </label>
+        <select name="lane" id="lane">
+          <option value="top" selected>Top</option>
+          <option value="jungle">Jungle</option>
+          <option value="mid">Mid</option>
+          <option value="bot">Bot</option>
+          <option value="support">Support</option>
+        </select>
+
+        <label for="type">Type : </label>
+        <select name="type" id="type">
+          <option value="mage" selected>Mage</option>
+          <option value="assassin">Assassin</option>
+          <option value="fighter">Fighter</option>
+          <option value="tank">Tank</option>
+          <option value="support">Support</option>
+        </select>
+
+        <label for="imageurl">Image URL : </label>
+        <input
+          type="url"
+          name="imageurl"
+          id="imageurl"
+          placeholder="Lien de l'image"
+        />
+
+        <button type="submit">Ajouter le champion</button>
+      </form>
+    </div>
+    <div id="divChamp">
+      <h2>Liste des champions</h2>
+      <div id="allChamp"></div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
