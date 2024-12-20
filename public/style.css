@@ -12,7 +12,6 @@ body {
 
 div {
   width: 95%;
-  max-width: 800px;
   padding: 1rem;
   margin-bottom: 1.5rem;
   background: #fff;
@@ -36,12 +35,15 @@ button:hover {
   background: #555;
   transform: scale(1.05);
 }
+h1,
+h2 {
+  text-align: center;
+}
 
 h1 {
   padding: 2rem;
   font-size: 2.5rem;
   color: #250060;
-  text-align: center;
 }
 
 input,
@@ -69,4 +71,26 @@ input::placeholder {
 
 .deletingButton {
   background-color: rgb(198, 0, 0);
+}
+
+#divForm {
+ max-width: 800px;
+}
+
+img{
+  width: 30%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  box-shadow: 2px 2px 4px 6px rgba(0, 0, 0, 0.08);
+}
+#allChamp > div {
+  flex: 1 1 calc(33.33% - 1rem); /* Chaque div prend un tiers moins l'espacement */
+  box-sizing: border-box; /* Inclure les marges et le padding dans la largeur */
+  padding: 1rem;
+  margin: 20; /* Supprimer les marges additionnelles */
+  background: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 2px 2px 4px 6px rgba(0, 0, 0, 0.08);
+  text-align: center; /* Centrer le contenu */
 }
