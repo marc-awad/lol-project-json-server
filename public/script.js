@@ -175,14 +175,22 @@ addButton.addEventListener("click", (e) => {
 displayInputButton.addEventListener("click", () => {
   popup.style.display = "none"
   let modifyChoice = document.getElementById("modifyChoice").value
-  if (modifyChoice === "name") {
-    nameDiv.style.display = "block"
-  } else if (modifyChoice === "lane") {
-    laneDiv.style.display = "block"
-  } else if (modifyChoice === "type") {
-    typeDiv.style.display = "block"
-  } else if (modifyChoice === "imageurl") {
-    imageurlDiv.style.display = "block"
+
+  switch (modifyChoice) {
+    case "name":
+      nameDiv.style.display = "block"
+      break
+    case "lane":
+      laneDiv.style.display = "block"
+      break
+    case "type":
+      typeDiv.style.display = "block"
+      break
+    case "imageurl":
+      imageurlDiv.style.display = "block"
+      break
+    default:
+      console.log("Option de modification invalide")
   }
 })
 
