@@ -118,7 +118,6 @@ function addChampionToJson(name, lane, type, imageurl) {
     alert("Invalid name")
     return
   }
-
   // Add the champion with fetch
   const newChamp = { name, lane, type, imageurl }
   fetchJSON(API_URL, {
