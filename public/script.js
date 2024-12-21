@@ -1,7 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////
+// Variable initialization
+////////////////////////////////////////////////////////////////////////////////////
+
 const divChamp = document.getElementById("divChamp")
 const champions = document.getElementById("allChamp")
 const addButton = document.getElementById("addButton")
-const deleteButton = document.getElementById("deleteButton")
 const overlay = document.getElementById("overlay")
 const popup = document.getElementById("popup")
 const displayInputButton = document.getElementById("displayInput")
@@ -12,204 +15,193 @@ const imageurlDiv = document.getElementById("modifyImage")
 const API_URL = "http://localhost:3000/champions"
 let modifyBlockID
 
+////////////////////////////////////////////////////////////////////////////////////
+// Utility functions
+////////////////////////////////////////////////////////////////////////////////////
+
+// Function with regex to validate the URL
 function isValidURL(URL) {
   const regex =
     /https?:\/\/(?:www\.)?[^\/\s]+\/[^\s?#]+\.(?:jpg|jpeg|png|gif|bmp|webp|svg)(?:\?[^\s#]*)?(?:#[^\s]*)?/i
   return regex.test(URL)
 }
 
+// Function with regex to validate the name
 function isValidLeagueOfLegendsName(name) {
   const regex = /^[a-zA-Z'\-]{2,}$/
   return regex.test(name)
 }
 
-function loadChampion() {
-  champions.innerHTML = ""
-  fetch(API_URL)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((champs) => {
-      if (champs.length === 0) {
-        divChamp.style.display = "none"
-      } else {
-        divChamp.style.display = "block"
-      }
-      champs.forEach((champ) => {
-        const champDiv = document.createElement("div")
-        const delButton = document.createElement("button")
-        const modifyButton = document.createElement("button")
-
-        delButton.innerHTML = "Supprimer"
-        delButton.classList.add("deletingButton")
-        delButton.addEventListener("click", async () => {
-          await deleteChampion(champ.id)
-        })
-
-        modifyButton.innerHTML = "Modifier"
-        modifyButton.addEventListener("click", async () => {
-          modifyBlockID = champ.id
-          await displayBlocks()
-        })
-
-        champDiv.innerHTML = `
-      <h2>${champ.name}</h2>
-      <img src="${champ.imageurl}" alt="${champ.name}">
-      <p>Lane : ${champ.lane}</p>
-      <p>Type : ${champ.type}</p>
-      `
-        champions.appendChild(champDiv)
-        champDiv.appendChild(delButton)
-        champDiv.appendChild(modifyButton)
-      })
-    })
-    .catch((error) => {
-      divChamp.style.display = "none"
-      console.error("Erreur lors du chargement des champions : ", error)
-    })
-}
-
-function addChampion(name, lane, type, imageurl) {
-  if (!isValidURL(imageurl)) {
-    alert("URL invalide")
-    return
-  }
-  if (!isValidLeagueOfLegendsName(name)) {
-    alert("Nom invalide")
-    return
-  }
-  let newChamp = {
-    name: name,
-    lane: lane,
-    type: type,
-    imageurl: imageurl,
-  }
-  fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newChamp),
+// Function to simplify fetch calls with error handling
+function fetchJSON(url, options = {}) {
+  return fetch(url, options).then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`)
+    }
+    return response.json()
   })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((data) => {
-      console.log("Champion ajouté : ", data)
-    })
-    .catch((error) => {
-      console.error("Erreur lors de l'ajout du champion : ", error)
-    })
-  loadChampion()
 }
 
-function deleteAllChampion() {
-  fetch(API_URL)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((champs) => {
-      champs.forEach((champ) => {
-        fetch(`${API_URL}/${champ.id}`, {
-          method: "DELETE",
-        })
-      })
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la suppresion des champions : ", error)
-    })
-  loadChampion()
+// Function to create a button
+function createButton(text, onClick) {
+  const button = document.createElement("button")
+  button.innerHTML = text
+  button.addEventListener("click", onClick)
+  return button
 }
 
-function deleteChampion(champId) {
-  fetch(`${API_URL}/${champId}`, {
-    method: "DELETE",
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((data) => {
-      console.log("Champion supprimé : ", data)
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la suppresion du champion : ", error)
-    })
-  loadChampion()
-}
-
-function displayBlocks() {
+// Function to display the modify popup
+function displayModifyPopup(champId) {
+  modifyBlockID = champId
   overlay.style.display = "block"
   popup.style.display = "block"
 }
 
+// Function to close the modify popups
 function closeAllPopup() {
   overlay.style.display = "none"
   popup.style.display = "none"
-  document.querySelectorAll(".popup").forEach((popupDiv) => {
-    popupDiv.style.display = "none"
-  })
+  document
+    .querySelectorAll(".popup")
+    .forEach((popupDiv) => (popupDiv.style.display = "none"))
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// CRUD Functions
+////////////////////////////////////////////////////////////////////////////////////
+
+// Create a html card for a champion
+function createChampionCard(champ) {
+  const champDiv = document.createElement("div")
+  champDiv.innerHTML = `
+    <h2>${champ.name}</h2>
+    <img src="${champ.imageurl}" alt="${champ.name}">
+    <p>Lane : ${champ.lane}</p>
+    <p>Type : ${champ.type}</p>
+  `
+
+  const delButton = createButton("Supprimer", () => deleteChampion(champ.id))
+  const modifyButton = createButton("Modifier", () =>
+    displayModifyPopup(champ.id)
+  )
+  delButton.classList.add("deletingButton")
+
+  champions.appendChild(champDiv)
+  champDiv.appendChild(delButton)
+  champDiv.appendChild(modifyButton)
+}
+
+// Function to load the champions GET request
+function loadChampion() {
+  // Empty the div before reloading
+  champions.innerHTML = ""
+  fetchJSON(API_URL)
+    .then((champs) => {
+      divChamp.style.display = champs.length ? "block" : "none"
+      champs.forEach((champ) => createChampionCard(champ))
+    })
+    .catch((error) => {
+      divChamp.style.display = "none"
+      console.error("Error loading champions: ", error)
+    })
+}
+
+// Add a champion POST request
+function addChampionToJson(name, lane, type, imageurl) {
+  // Check if the URL is valid
+  if (!isValidURL(imageurl)) {
+    alert("Invalid URL")
+    return
+  }
+  // Check if the name is valid
+  if (!isValidLeagueOfLegendsName(name)) {
+    alert("Invalid name")
+    return
+  }
+
+  // Add the champion with fetch
+  const newChamp = { name, lane, type, imageurl }
+  fetchJSON(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newChamp),
+  }).then(() => loadChampion())
+}
+
+// Delete a champion DELETE request
+function deleteChampion(champId) {
+  fetchJSON(`${API_URL}/${champId}`, { method: "DELETE" })
+    .then(() => loadChampion())
+    .catch((error) => console.error("Error deleting champion: ", error))
+}
+
+// Delete all champions DELETE request
+function deleteAllChampion() {
+  // Retrieve all champions
+  fetchJSON(API_URL)
+    .then((champs) => {
+      champs.forEach((champ) => {
+        // Delete each champion with fetch using their ID
+        fetchJSON(`${API_URL}/${champ.id}`, { method: "DELETE" })
+      })
+    })
+    .catch((error) => console.error("Error deleting champions: ", error))
+  loadChampion()
+}
+
+// Function to modify a champion by its ID PATCH request
+function modifyChampion(field, champId, newValue) {
+  fetchJSON(`${API_URL}/${champId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ [field]: newValue }),
+  })
+    .then(() => loadChampion())
+    .catch((error) => console.error("Error modifying champion: ", error))
+  closeAllPopup()
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+//Event Listeners
+////////////////////////////////////////////////////////////////////////////////////
+
+// Button events that call the addChampionToJson method after retrieving the values
 addButton.addEventListener("click", (e) => {
   e.preventDefault()
-  let name = document.getElementById("name").value
-  let lane = document.getElementById("lane").value
-  let type = document.getElementById("type").value
-  let imageurl = document.getElementById("imageurl").value
-
-  addChampion(name, lane, type, imageurl)
+  const name = document.getElementById("name").value
+  const lane = document.getElementById("lane").value
+  const type = document.getElementById("type").value
+  const imageurl = document.getElementById("imageurl").value
+  addChampionToJson(name, lane, type, imageurl)
 })
 
+// Button events
 displayInputButton.addEventListener("click", () => {
   popup.style.display = "none"
-  let modifyChoice = document.getElementById("modifyChoice").value
-
-  switch (modifyChoice) {
-    case "name":
-      nameDiv.style.display = "block"
-      break
-    case "lane":
-      laneDiv.style.display = "block"
-      break
-    case "type":
-      typeDiv.style.display = "block"
-      break
-    case "imageurl":
-      imageurlDiv.style.display = "block"
-      break
-    default:
-      console.log("Option de modification invalide")
+  const modifyChoice = document.getElementById("modifyChoice").value
+  const modifyDivs = {
+    name: nameDiv,
+    lane: laneDiv,
+    type: typeDiv,
+    imageurl: imageurlDiv,
+  }
+  if (modifyDivs[modifyChoice]) {
+    modifyDivs[modifyChoice].style.display = "block"
   }
 })
 
-const validateButton = document.querySelectorAll(".popup button")
-validateButton.forEach((button) => {
+// Retrieve all popup buttons and add an event listener
+document.querySelectorAll(".popup button").forEach((button) => {
   button.addEventListener("click", () => {
     const champId = modifyBlockID
     switch (button.id) {
       case "validateName":
-        if (
-          !isValidLeagueOfLegendsName(
-            document.getElementById("modifyNameInput").value
-          )
-        ) {
-          alert("Nom invalide")
+        const newName = document.getElementById("modifyNameInput").value
+        if (!isValidLeagueOfLegendsName(newName)) {
+          alert("Invalid name")
           return
         }
-        let newChampName = document.getElementById("modifyNameInput").value
-        modifyChampion("name", champId, newChampName)
+        modifyChampion("name", champId, newName)
         break
       case "validateLane":
         modifyChampion(
@@ -226,38 +218,19 @@ validateButton.forEach((button) => {
         )
         break
       case "validateImage":
-        let newChampImage = document.getElementById("modifyImageInput").value
-        if (!isValidURL(newChampImage)) {
-          alert("URL invalide")
+        const newImage = document.getElementById("modifyImageInput").value
+        if (!isValidURL(newImage)) {
+          alert("Invalid URL")
           return
         }
-        modifyChampion("imageurl", champId, newChampImage)
+        modifyChampion("imageurl", champId, newImage)
         break
     }
   })
 })
 
-function modifyChampion(buttonText, champId, newValue) {
-  fetch(`${API_URL}/${champId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ [buttonText]: newValue }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((data) => {
-      console.log("Champion modifié : ", data)
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la modification du champion : ", error)
-    })
-}
-
+// Close the modify popups when clicking on the overlay
 overlay.addEventListener("click", closeAllPopup)
+
+// Initialize champions on load
 loadChampion()
