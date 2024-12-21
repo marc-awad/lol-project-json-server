@@ -1,3 +1,11 @@
 {
-  "champions": []
+  "champions": [
+    {
+      "name": "Garen",
+      "lane": "Top",
+      "type": "Mage",
+      "imageurl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg",
+      "id": 1
+    }
+  ]
 }

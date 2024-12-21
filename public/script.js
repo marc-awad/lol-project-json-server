@@ -200,11 +200,16 @@ validateButton.forEach((button) => {
     const champId = modifyBlockID
     switch (button.id) {
       case "validateName":
-        modifyChampion(
-          "name",
-          champId,
-          document.getElementById("modifyNameInput").value
-        )
+        if (
+          !isValidLeagueOfLegendsName(
+            document.getElementById("modifyNameInput").value
+          )
+        ) {
+          alert("Nom invalide")
+          return
+        }
+        let newChampName = document.getElementById("modifyNameInput").value
+        modifyChampion("name", champId, newChampName)
         break
       case "validateLane":
         modifyChampion(
@@ -221,18 +226,18 @@ validateButton.forEach((button) => {
         )
         break
       case "validateImage":
-        modifyChampion(
-          "imageurl",
-          champId,
-          document.getElementById("modifyImageInput").value
-        )
+        let newChampImage = document.getElementById("modifyImageInput").value
+        if (!isValidURL(newChampImage)) {
+          alert("URL invalide")
+          return
+        }
+        modifyChampion("imageurl", champId, newChampImage)
         break
     }
   })
 })
 
 function modifyChampion(buttonText, champId, newValue) {
-  console.log(buttonText, champId, newValue)
   fetch(`${API_URL}/${champId}`, {
     method: "PATCH",
     headers: {
