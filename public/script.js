@@ -60,7 +60,8 @@ function loadChampion() {
       })
     })
     .catch((error) => {
-      console.error("Erreur lors de la suppresion des champions : ", error)
+      divChamp.style.display = "none"
+      console.error("Erreur lors du chargement des champions : ", error)
     })
 }
 
