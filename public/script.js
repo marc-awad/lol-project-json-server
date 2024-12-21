@@ -9,6 +9,7 @@ const nameDiv = document.getElementById("modifyName")
 const laneDiv = document.getElementById("modifyLane")
 const typeDiv = document.getElementById("modifyType")
 const imageurlDiv = document.getElementById("modifyImage")
+const API_URL = "http://localhost:3000/champions"
 let modifyBlockID
 
 function isValidURL(URL) {
@@ -18,13 +19,19 @@ function isValidURL(URL) {
 }
 
 function isValidLeagueOfLegendsName(name) {
-  const regex = /^[a-zA-Z']{2,}$/
+  const regex = /^[a-zA-Z'\-]{2,}$/
   return regex.test(name)
 }
 
 function loadChampion() {
-  fetch("http://localhost:3000/champions")
-    .then((response) => response.json())
+  champions.innerHTML = ""
+  fetch(API_URL)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`)
+      }
+      return response.json()
+    })
     .then((champs) => {
       if (champs.length === 0) {
         divChamp.style.display = "none"
@@ -32,9 +39,9 @@ function loadChampion() {
         divChamp.style.display = "block"
       }
       champs.forEach((champ) => {
-        champDiv = document.createElement("div")
-        delButton = document.createElement("button")
-        modifyButton = document.createElement("button")
+        const champDiv = document.createElement("div")
+        const delButton = document.createElement("button")
+        const modifyButton = document.createElement("button")
 
         delButton.innerHTML = "Supprimer"
         delButton.classList.add("deletingButton")
@@ -80,14 +87,19 @@ function addChampion(name, lane, type, imageurl) {
     type: type,
     imageurl: imageurl,
   }
-  fetch("http://localhost:3000/champions", {
+  fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(newChamp),
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`)
+      }
+      return response.json()
+    })
     .then((data) => {
       console.log("Champion ajouté : ", data)
     })
@@ -98,11 +110,16 @@ function addChampion(name, lane, type, imageurl) {
 }
 
 function deleteAllChampion() {
-  fetch("http://localhost:3000/champions")
-    .then((response) => response.json())
+  fetch(API_URL)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`)
+      }
+      return response.json()
+    })
     .then((champs) => {
       champs.forEach((champ) => {
-        fetch(`http://localhost:3000/champions/${champ.id}`, {
+        fetch(`${API_URL}/${champ.id}`, {
           method: "DELETE",
         })
       })
@@ -114,10 +131,15 @@ function deleteAllChampion() {
 }
 
 function deleteChampion(champId) {
-  fetch(`http://localhost:3000/champions/${champId}`, {
+  fetch(`${API_URL}/${champId}`, {
     method: "DELETE",
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`)
+      }
+      return response.json()
+    })
     .then((data) => {
       console.log("Champion supprimé : ", data)
     })
@@ -203,14 +225,19 @@ validateButton.forEach((button) => {
 
 function modifyChampion(buttonText, champId, newValue) {
   console.log(buttonText, champId, newValue)
-  fetch(`http://localhost:3000/champions/${champId}`, {
+  fetch(`${API_URL}/${champId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ [buttonText]: newValue }),
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`)
+      }
+      return response.json()
+    })
     .then((data) => {
       console.log("Champion modifié : ", data)
     })
