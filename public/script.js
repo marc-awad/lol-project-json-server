@@ -4,11 +4,12 @@ const addButton = document.getElementById("addButton")
 const deleteButton = document.getElementById("deleteButton")
 const overlay = document.getElementById("overlay")
 const popup = document.getElementById("popup")
-const modifyChampionButton = document.getElementById("modifyChampion")
+const displayInputButton = document.getElementById("displayInput")
 const nameDiv = document.getElementById("modifyName")
 const laneDiv = document.getElementById("modifyLane")
 const typeDiv = document.getElementById("modifyType")
 const imageurlDiv = document.getElementById("modifyImage")
+let modifyBlockID
 
 function isValidURL(URL) {
   const regex =
@@ -43,7 +44,8 @@ function loadChampion() {
 
         modifyButton.innerHTML = "Modifier"
         modifyButton.addEventListener("click", async () => {
-          await modifyChampion(champ.id)
+          modifyBlockID = champ.id
+          await displayBlocks()
         })
 
         champDiv.innerHTML = `
@@ -110,16 +112,6 @@ function deleteAllChampion() {
   loadChampion()
 }
 
-addButton.addEventListener("click", (e) => {
-  e.preventDefault()
-  let name = document.getElementById("name").value
-  let lane = document.getElementById("lane").value
-  let type = document.getElementById("type").value
-  let imageurl = document.getElementById("imageurl").value
-
-  addChampion(name, lane, type, imageurl)
-})
-
 function deleteChampion(champId) {
   fetch(`http://localhost:3000/champions/${champId}`, {
     method: "DELETE",
@@ -134,30 +126,97 @@ function deleteChampion(champId) {
   loadChampion()
 }
 
-function modifyChampion(champID) {
+function displayBlocks() {
   overlay.style.display = "block"
   popup.style.display = "block"
-  modifyChampionButton.addEventListener("click", () => {
-    popup.style.display = "none"
-    let modifyChoice = document.getElementById("modifyChoice").value
-    if (modifyChoice === "name") {
-      nameDiv.style.display = "block"
-    } else if (modifyChoice === "lane") {
-      laneDiv.style.display = "block"
-    } else if (modifyChoice === "type") {
-      typeDiv.style.display = "block"
-    } else if (modifyChoice === "imageurl") {
-      imageurlDiv.style.display = "block"
-    }
+}
+
+function closeAllPopup() {
+  overlay.style.display = "none"
+  popup.style.display = "none"
+  document.querySelectorAll(".popup").forEach((popupDiv) => {
+    popupDiv.style.display = "none"
   })
 }
 
-overlay.addEventListener("click", () => {
-  overlay.style.display = "none"
-  popup.style.display = "none"
-  nameDiv.style.display = "none"
-  laneDiv.style.display = "none"
-  typeDiv.style.display = "none"
-  imageurlDiv.style.display = "none"
+addButton.addEventListener("click", (e) => {
+  e.preventDefault()
+  let name = document.getElementById("name").value
+  let lane = document.getElementById("lane").value
+  let type = document.getElementById("type").value
+  let imageurl = document.getElementById("imageurl").value
+
+  addChampion(name, lane, type, imageurl)
 })
+
+displayInputButton.addEventListener("click", () => {
+  popup.style.display = "none"
+  let modifyChoice = document.getElementById("modifyChoice").value
+  if (modifyChoice === "name") {
+    nameDiv.style.display = "block"
+  } else if (modifyChoice === "lane") {
+    laneDiv.style.display = "block"
+  } else if (modifyChoice === "type") {
+    typeDiv.style.display = "block"
+  } else if (modifyChoice === "imageurl") {
+    imageurlDiv.style.display = "block"
+  }
+})
+
+const validateButton = document.querySelectorAll(".popup button")
+validateButton.forEach((button) => {
+  button.addEventListener("click", () => {
+    const champId = modifyBlockID
+    switch (button.id) {
+      case "validateName":
+        modifyChampion(
+          "name",
+          champId,
+          document.getElementById("modifyNameInput").value
+        )
+        break
+      case "validateLane":
+        modifyChampion(
+          "lane",
+          champId,
+          document.getElementById("modifyLaneSelect").value
+        )
+        break
+      case "validateType":
+        modifyChampion(
+          "type",
+          champId,
+          document.getElementById("modifyTypeSelect").value
+        )
+        break
+      case "validateImage":
+        modifyChampion(
+          "imageurl",
+          champId,
+          document.getElementById("modifyImageInput").value
+        )
+        break
+    }
+  })
+})
+
+function modifyChampion(buttonText, champId, newValue) {
+  console.log(buttonText, champId, newValue)
+  fetch(`http://localhost:3000/champions/${champId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ [buttonText]: newValue }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Champion modifié : ", data)
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la modification du champion : ", error)
+    })
+}
+
+overlay.addEventListener("click", closeAllPopup)
 loadChampion()
